@@ -1,0 +1,68 @@
+@model List<WebApplication1.Models.BookIssue>
+
+@{
+    ViewData["Title"] = "Issued books";
+}
+
+<h1>Issued books</h1>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">
+        There are no issued books now.
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var issue in Model)
+        {
+            if (issue.Book != null && issue.LibraryUser != null)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        <img src="@issue.Book.CoverImageUrl"
+                             class="card-img-top"
+                             alt="@issue.Book.Title"
+                             style="height: 250px; object-fit: cover;" />
+
+                        <div class="card-body">
+                            <h5>@issue.Book.Title</h5>
+
+                            <p>
+                                <strong>Author:</strong> @issue.Book.Author
+                            </p>
+
+                            <p>
+                                <strong>Taken by:</strong>
+                                @issue.LibraryUser.FirstName @issue.LibraryUser.LastName
+                            </p>
+
+                            <p>
+                                <strong>Email:</strong> @issue.LibraryUser.Email
+                            </p>
+
+                            <p>
+                                <strong>Issued at:</strong> @issue.IssuedAt.ToString("dd.MM.yyyy HH:mm")
+                            </p>
+
+                            <a asp-action="Details"
+                               asp-controller="Book"
+                               asp-route-id="@issue.Book.Id"
+                               class="btn btn-outline-primary">
+                                Book details
+                            </a>
+
+                            <a asp-action="Details"
+                               asp-controller="LibraryUser"
+                               asp-route-id="@issue.LibraryUser.Id"
+                               class="btn btn-outline-secondary">
+                                User details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}

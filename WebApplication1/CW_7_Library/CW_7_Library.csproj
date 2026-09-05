@@ -24,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Views\BookIssue\" />
       <Folder Include="Views\Book\" />
       <Folder Include="Views\LibraryUser\" />
     </ItemGroup>
