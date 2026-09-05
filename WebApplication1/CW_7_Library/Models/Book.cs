@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WebApplication1.Models;
 
-namespace CW_7_Library.Models;
+namespace WebApplication1.Models;
 
 public class Book
 {
@@ -23,4 +23,6 @@ public class Book
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
     public bool IsIssued { get; set; } = false;
+    
+    public List<BookIssue> BookIssues { get; set; } = new List<BookIssue>();
 }
