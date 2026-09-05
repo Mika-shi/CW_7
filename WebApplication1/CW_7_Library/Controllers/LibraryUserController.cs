@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
+using WebApplication1.ViewModel;
 
 namespace WebApplication1.Controllers;
 
@@ -15,9 +16,7 @@ public class LibraryUserController : Controller
 
     public IActionResult Index()
     {
-        List<LibraryUser> users = _context.LibraryUsers.OrderBy(user => user.LastName).ThenBy(user => user.FirstName).ToList();
-
-        return View(users);
+        return View();
     }
 
     [HttpGet]
@@ -63,7 +62,7 @@ public class LibraryUserController : Controller
     
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult ReturnBook(int issueId)
+    public IActionResult ReturnBook(int issueId, string? email)
     {
         BookIssue? issue = _context.BookIssues
             .Include(issue => issue.Book)
@@ -82,7 +81,36 @@ public class LibraryUserController : Controller
         }
 
         _context.SaveChanges();
+        
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            return RedirectToAction("Cabinet", new { email = email });
+        }
 
         return RedirectToAction("Details", new { id = issue.LibraryUserId });
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult FindByEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            TempData["CabinetError"] = "Enter email.";
+            return RedirectToAction("Index");
+        }
+
+        string userEmail = email.Trim().ToLower();
+
+        LibraryUser? user = _context.LibraryUsers
+            .FirstOrDefault(user => user.Email.ToLower() == userEmail);
+
+        if (user == null)
+        {
+            TempData["CabinetError"] = "User with this email was not found.";
+            return RedirectToAction("Index");
+        }
+
+        return RedirectToAction("Details", new { id = user.Id });
     }
 }

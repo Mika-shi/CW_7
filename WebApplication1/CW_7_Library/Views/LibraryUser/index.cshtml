@@ -4,49 +4,31 @@
     ViewData["Title"] = "Library users";
 }
 
-<h1>Library users</h1>
+<h1>Personal account</h1>
+
+<h4>Find your books</h4>
+
+<form asp-action="FindByEmail" asp-controller="LibraryUser" method="post" class="mb-4">
+    @if (TempData["CabinetError"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["CabinetError"]
+        </div>
+    }
+    <div class="mb-3">
+        <label class="form-label">Enter your email</label>
+        <input type="email" name="email" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Show my books
+    </button>
+</form>
+
+<hr />
+
+<h2>New user?</h2>
 
 <a asp-action="Create" asp-controller="LibraryUser" class="btn btn-primary mb-3">
     Register new user
 </a>
-
-@if (Model.Count == 0)
-{
-    <div class="alert alert-warning">
-        No registered users yet.
-    </div>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>First name</th>
-            <th>Last name</th>
-            <th>Email</th>
-            <th>Phone number</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        @foreach (var user in Model)
-        {
-            <tr>
-                <td>@user.FirstName</td>
-                <td>@user.LastName</td>
-                <td>@user.Email</td>
-                <td>@user.PhoneNumber</td>
-                <td>
-                    <a asp-action="Details"
-                       asp-controller="LibraryUser"
-                       asp-route-id="@user.Id"
-                       class="btn btn-outline-primary">
-                        Details
-                    </a>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
