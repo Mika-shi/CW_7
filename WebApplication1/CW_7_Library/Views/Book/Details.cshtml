@@ -70,6 +70,17 @@
                         <span>No description</span>
                     }
                 </p>
+                
+                <p>
+                    @if (!string.IsNullOrWhiteSpace(Model.PdfFilePath))
+                    {
+                        <a href="@Model.PdfFilePath"
+                           class="btn btn-outline-success"
+                           download>
+                            Download PDF
+                        </a>
+                    }
+                </p>
 
                 <a asp-action="Index"
                    asp-controller="Book"

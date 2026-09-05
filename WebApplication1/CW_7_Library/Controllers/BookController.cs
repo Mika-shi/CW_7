@@ -9,9 +9,12 @@ namespace WebApplication1.Controllers;
 public class BookController : Controller
 {
     private readonly LibraryDbContext _context;
-    public BookController(LibraryDbContext context)
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
+    public BookController(LibraryDbContext context, IWebHostEnvironment webHostEnvironment)
     {
         _context = context;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     public IActionResult Index(string? title, string? author, string? status, string? sortOrder, int  page = 1)
@@ -107,7 +110,7 @@ public class BookController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(Book book)
+    public IActionResult Create(Book book, IFormFile? pdfFile)
     {
         if (book.CategoryId == null)
         {
@@ -129,6 +132,26 @@ public class BookController : Controller
         book.CreatedOn = DateTime.UtcNow;
         book.IsIssued = false;
 
+        if (pdfFile != null && pdfFile.Length > 0)
+        {
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "book-files");
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(pdfFile.FileName);
+            string filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                pdfFile.CopyTo(fileStream);
+            }
+
+            book.PdfFilePath = "/book-files/" + fileName;
+        }
+        
         _context.Books.Add(book);
         _context.SaveChanges();
 
@@ -156,7 +179,7 @@ public class BookController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, Book book)
+    public IActionResult Edit(int id, Book book, IFormFile? pdfFile)
     {
         if (id != book.Id)
         {
@@ -193,6 +216,26 @@ public class BookController : Controller
         existingBook.ReleaseYear = book.ReleaseYear;
         existingBook.Description = book.Description;
         existingBook.CategoryId = book.CategoryId;
+        
+        if (pdfFile != null && pdfFile.Length > 0)
+        {
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "book-files");
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(pdfFile.FileName);
+            string filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                pdfFile.CopyTo(fileStream);
+            }
+
+            existingBook.PdfFilePath = "/book-files/" + fileName;
+        }
 
         _context.SaveChanges();
 

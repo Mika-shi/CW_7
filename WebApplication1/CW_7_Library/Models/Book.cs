@@ -16,9 +16,12 @@ public class Book
     [Required(ErrorMessage = "Добавьте фото обложки")]
     public string CoverImageUrl { get; set; } = "";
 
+    [Range(1, 2027, ErrorMessage = "Enter correct release year")]
     public int? ReleaseYear { get; set; }
-
+    
     public string? Description { get; set; }
+    
+    public string? PdfFilePath { get; set; }
 
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
