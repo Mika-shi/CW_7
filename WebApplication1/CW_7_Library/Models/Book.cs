@@ -24,5 +24,9 @@ public class Book
 
     public bool IsIssued { get; set; } = false;
     
+    public int? CategoryId { get; set; }
+
+    public Category? Category { get; set; }
+    
     public List<BookIssue> BookIssues { get; set; } = new List<BookIssue>();
 }

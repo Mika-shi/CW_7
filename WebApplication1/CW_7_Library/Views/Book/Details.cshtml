@@ -34,6 +34,11 @@
                         <span class="text-success">Available</span>
                     }
                 </p>
+                
+                <p>
+                    <strong>Category:</strong>
+                    @(Model.Category != null ? Model.Category.Name : "Not selected")
+                </p>
 
                 <p>
                     <strong>Release year:</strong>

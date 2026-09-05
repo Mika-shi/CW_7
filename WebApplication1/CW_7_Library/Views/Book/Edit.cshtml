@@ -30,6 +30,14 @@
     </div>
 
     <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
+            <option value="">Choose category</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    
+    <div class="mb-3">
         <label asp-for="ReleaseYear" class="form-label">Release year</label>
         <input asp-for="ReleaseYear" type="number" class="form-control" />
         <span asp-validation-for="ReleaseYear" class="text-danger"></span>

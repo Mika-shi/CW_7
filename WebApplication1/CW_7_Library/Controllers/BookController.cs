@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.ViewModel;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WebApplication1.Controllers;
 
@@ -43,7 +44,7 @@ public class BookController : Controller
 
     public IActionResult Details(int id)
     {
-        Book? book = _context.Books.FirstOrDefault(book => book.Id == id);
+        Book? book = _context.Books.Include(book => book.Category).FirstOrDefault(book => book.Id == id);
         if (book == null)
         {
             return NotFound("Book not found");
@@ -54,6 +55,11 @@ public class BookController : Controller
     [HttpGet]
     public IActionResult Create()
     {
+        ViewBag.Categories = new SelectList(
+            _context.Categories.OrderBy(category => category.Name).ToList(),
+            "Id",
+            "Name"
+        );
         return View();
     }
 
@@ -61,18 +67,30 @@ public class BookController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Create(Book book)
     {
-        if (ModelState.IsValid)
+        if (book.CategoryId == null)
         {
-            book.CreatedOn =  DateTime.UtcNow;
-            book.IsIssued = false;
-            
-            _context.Books.Add(book);
-            _context.SaveChanges();
-            
-            return RedirectToAction(nameof(Index));
+            ModelState.AddModelError("CategoryId", "Choose category");
         }
-        return View(book);
-        
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Categories = new SelectList(
+                _context.Categories.OrderBy(category => category.Name).ToList(),
+                "Id",
+                "Name",
+                book.CategoryId
+            );
+
+            return View(book);
+        }
+
+        book.CreatedOn = DateTime.UtcNow;
+        book.IsIssued = false;
+
+        _context.Books.Add(book);
+        _context.SaveChanges();
+
+        return RedirectToAction("Index");
     }
 
     [HttpGet]
@@ -84,33 +102,59 @@ public class BookController : Controller
         {
             return NotFound();
         }
+        
+        ViewBag.Categories = new SelectList(
+            _context.Categories.OrderBy(category => category.Name).ToList(),
+            "Id",
+            "Name",
+            book.CategoryId
+        );
         return View(book);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(Book book)
+    public IActionResult Edit(int id, Book book)
     {
-        if (ModelState.IsValid)
+        if (id != book.Id)
         {
-            Book? existingBook = _context.Books.FirstOrDefault(item => item.Id == book.Id);
-
-            if (existingBook == null)
-            {
-                return NotFound();
-            }
-            
-            existingBook.Title = book.Title;
-            existingBook.Author = book.Author;
-            existingBook.CoverImageUrl = book.CoverImageUrl;
-            existingBook.ReleaseYear = book.ReleaseYear;
-            existingBook.Description = book.Description;
-            
-            _context.SaveChanges();
-            
-            return RedirectToAction("Index");
+            return NotFound();
         }
-        return View(book);
+
+        if (book.CategoryId == null)
+        {
+            ModelState.AddModelError("CategoryId", "Choose category");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Categories = new SelectList(
+                _context.Categories.OrderBy(category => category.Name).ToList(),
+                "Id",
+                "Name",
+                book.CategoryId
+            );
+
+            return View(book);
+        }
+
+        Book? existingBook = _context.Books.FirstOrDefault(existingBook => existingBook.Id == id);
+
+        if (existingBook == null)
+        {
+            return NotFound();
+        }
+
+        existingBook.Title = book.Title;
+        existingBook.Author = book.Author;
+        existingBook.CoverImageUrl = book.CoverImageUrl;
+        existingBook.ReleaseYear = book.ReleaseYear;
+        existingBook.Description = book.Description;
+        existingBook.CategoryId = book.CategoryId;
+
+        _context.SaveChanges();
+
+        return RedirectToAction("Index");
     }
 
     [HttpGet]
