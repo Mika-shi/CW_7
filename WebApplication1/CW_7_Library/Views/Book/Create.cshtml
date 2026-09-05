@@ -1,0 +1,53 @@
+@model CW_7_Library.Models.Book
+
+@{
+    ViewData["Title"] = "Add new book";
+}
+
+<h1>Add new book</h1>
+
+<form asp-action="Create" asp-controller="Book" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label">Title</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Author" class="form-label">Author</label>
+        <input asp-for="Author" class="form-control" />
+        <span asp-validation-for="Author" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CoverImageUrl" class="form-label">Cover image URL</label>
+        <input asp-for="CoverImageUrl" class="form-control" />
+        <span asp-validation-for="CoverImageUrl" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ReleaseYear" class="form-label">Release year</label>
+        <input asp-for="ReleaseYear" type="number" class="form-control" />
+        <span asp-validation-for="ReleaseYear" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Save
+    </button>
+
+    <a asp-action="Index" asp-controller="Book" class="btn btn-secondary">
+        Back
+    </a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

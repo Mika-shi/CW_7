@@ -1,0 +1,117 @@
+@model List<CW_7_Library.Models.Book>
+
+@{
+    ViewData["Title"] = "Library";
+}
+
+<h1>Library</h1>
+
+<a asp-action="Create" asp-controller="Book" class="btn btn-primary mb-3">
+    Add new book
+</a>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-warning">
+        No books in library yet.
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var book in Model)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <img src="@book.CoverImageUrl"
+                         class="card-img-top"
+                         alt="@book.Title"
+                         style="height: 260px; object-fit: cover;" />
+
+                    <div class="card-body">
+                        <h5 class="card-title">@book.Title</h5>
+
+                        <p class="card-text">
+                            <strong>Author:</strong> @book.Author
+                        </p>
+
+                        <p class="card-text">
+                            <strong>Status:</strong>
+                            @if (book.IsIssued)
+                            {
+                                <span class="text-danger">Issued</span>
+                            }
+                            else
+                            {
+                                <span class="text-success">Available</span>
+                            }
+                        </p>
+
+                        <a asp-action="Details"
+                           asp-controller="Book"
+                           asp-route-id="@book.Id"
+                           class="btn btn-outline-primary">
+                            Details
+                        </a>
+
+                        @if (!book.IsIssued)
+                        {
+                            <form asp-action="Take"
+                                  asp-controller="Book"
+                                  asp-route-id="@book.Id"
+                                  method="post"
+                                  style="display:inline;">
+                                <button type="submit" class="btn btn-success">
+                                    Take
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary" disabled>
+                                Already issued
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (ViewBag.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            @if (ViewBag.Page > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-controller="Book"
+                       asp-route-page="@(ViewBag.Page - 1)">
+                        Previous
+                    </a>
+                </li>
+            }
+
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Page @ViewBag.Page of @ViewBag.TotalPages
+                </span>
+            </li>
+
+            @if (ViewBag.Page < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-controller="Book"
+                       asp-route-page="@(ViewBag.Page + 1)">
+                        Next
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

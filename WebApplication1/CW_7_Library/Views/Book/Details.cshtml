@@ -1,0 +1,91 @@
+@model CW_7_Library.Models.Book
+
+@{
+    ViewData["Title"] = "Book details";
+}
+
+<h1>Book details</h1>
+
+<div class="card mb-3" style="max-width: 900px;">
+    <div class="row g-0">
+        <div class="col-md-4">
+            <img src="@Model.CoverImageUrl"
+                 class="img-fluid rounded-start"
+                 alt="@Model.Title"
+                 style="height: 100%; object-fit: cover;" />
+        </div>
+
+        <div class="col-md-8">
+            <div class="card-body">
+                <h3 class="card-title">@Model.Title</h3>
+
+                <p>
+                    <strong>Author:</strong> @Model.Author
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    @if (Model.IsIssued)
+                    {
+                        <span class="text-danger">Issued</span>
+                    }
+                    else
+                    {
+                        <span class="text-success">Available</span>
+                    }
+                </p>
+
+                <p>
+                    <strong>Release year:</strong>
+                    @if (Model.ReleaseYear != null)
+                    {
+                        @Model.ReleaseYear
+                    }
+                    else
+                    {
+                        <span>Not specified</span>
+                    }
+                </p>
+
+                <p>
+                    <strong>Date added:</strong> @Model.CreatedOn.ToString("dd.MM.yyyy HH:mm")
+                </p>
+
+                <p>
+                    <strong>Description:</strong>
+                </p>
+
+                <p>
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        @Model.Description
+                    }
+                    else
+                    {
+                        <span>No description</span>
+                    }
+                </p>
+
+                <a asp-action="Index"
+                   asp-controller="Book"
+                   class="btn btn-secondary">
+                    Back
+                </a>
+
+                <a asp-action="Edit"
+                   asp-controller="Book"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-warning">
+                    Edit
+                </a>
+                
+                <a asp-action="Delete"
+                   asp-controller="Book"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-danger">
+                    Delete
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
