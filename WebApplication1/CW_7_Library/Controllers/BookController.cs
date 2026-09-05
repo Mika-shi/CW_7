@@ -1,6 +1,7 @@
 ﻿using WebApplication1.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.ViewModel;
 
 namespace WebApplication1.Controllers;
 
@@ -22,7 +23,7 @@ public class BookController : Controller
 
         if (page < 1)
         {
-            pageSize = 1;
+            page = 1;
         }
         int totalPages = (int)Math.Ceiling(count / (double)pageSize);
 
@@ -140,8 +141,7 @@ public class BookController : Controller
         return RedirectToAction("Index");
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpGet]
     public IActionResult Take(int id)
     {
         Book? book = _context.Books.FirstOrDefault(book => book.Id == id);
@@ -151,12 +151,82 @@ public class BookController : Controller
             return NotFound();
         }
 
-        if (!book.IsIssued)
+        if (book.IsIssued)
         {
-            book.IsIssued = true;
-            _context.SaveChanges();
+            TempData["Message"] = "This book is already issued.";
+            return RedirectToAction("Details", new { id = id });
         }
-        
+
+        TakeBookViewModel model = new TakeBookViewModel
+        {
+            BookId = id
+        };
+
+        ViewBag.Book = book;
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Take(TakeBookViewModel model)
+    {
+        Book? book = _context.Books.FirstOrDefault(book => book.Id == model.BookId);
+
+        if (book == null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Book = book;
+            return View(model);
+        }
+
+        if (book.IsIssued)
+        {
+            ModelState.AddModelError("", "This book is already issued.");
+            ViewBag.Book = book;
+            return View(model);
+        }
+
+        string email = model.Email.Trim().ToLower();
+
+        LibraryUser? user = _context.LibraryUsers
+            .FirstOrDefault(user => user.Email.ToLower() == email);
+
+        if (user == null)
+        {
+            ModelState.AddModelError("", "User with this email was not found.");
+            ViewBag.Book = book;
+            return View(model);
+        }
+
+        int activeBooksCount = _context.BookIssues
+            .Count(issue => issue.LibraryUserId == user.Id && issue.ReturnedAt == null);
+
+        if (activeBooksCount >= 3)
+        {
+            ModelState.AddModelError("", "User cannot take more than 3 books.");
+            ViewBag.Book = book;
+            return View(model);
+        }
+
+        BookIssue bookIssue = new BookIssue
+        {
+            BookId = book.Id,
+            LibraryUserId = user.Id,
+            IssuedAt = DateTime.UtcNow,
+            ReturnedAt = null
+        };
+
+        _context.BookIssues.Add(bookIssue);
+
+        book.IsIssued = true;
+
+        _context.SaveChanges();
+
         return RedirectToAction("Index");
     }
 }

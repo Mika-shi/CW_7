@@ -52,6 +52,16 @@ else
                             <h5>@issue.Book.Title</h5>
                             <p><strong>Author:</strong> @issue.Book.Author</p>
                             <p><strong>Issued at:</strong> @issue.IssuedAt.ToString("dd.MM.yyyy HH:mm")</p>
+                            <form asp-action="ReturnBook"
+                                  asp-controller="LibraryUser"
+                                  method="post"
+                                  onsubmit="return confirm('Are you sure you want to return this book?');">
+                                <input type="hidden" name="issueId" value="@issue.Id" />
+
+                                <button type="submit" class="btn btn-success">
+                                    Return book
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -60,4 +60,29 @@ public class LibraryUserController : Controller
 
         return View(user);
     }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult ReturnBook(int issueId)
+    {
+        BookIssue? issue = _context.BookIssues
+            .Include(issue => issue.Book)
+            .FirstOrDefault(issue => issue.Id == issueId && issue.ReturnedAt == null);
+
+        if (issue == null)
+        {
+            return NotFound();
+        }
+
+        issue.ReturnedAt = DateTime.UtcNow;
+
+        if (issue.Book != null)
+        {
+            issue.Book.IsIssued = false;
+        }
+
+        _context.SaveChanges();
+
+        return RedirectToAction("Details", new { id = issue.LibraryUserId });
+    }
 }

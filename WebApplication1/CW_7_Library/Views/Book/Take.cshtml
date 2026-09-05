@@ -1,0 +1,43 @@
+@model WebApplication1.ViewModel.TakeBookViewModel
+
+@{
+    ViewData["Title"] = "Take book";
+    var book = ViewBag.Book as WebApplication1.Models.Book;
+}
+
+<h1>Take book</h1>
+
+@if (book != null)
+{
+    <div class="card mb-3" style="max-width: 600px;">
+        <div class="card-body">
+            <h4>@book.Title</h4>
+            <p><strong>Author:</strong> @book.Author</p>
+            <p><strong>Status:</strong> Available</p>
+        </div>
+    </div>
+}
+
+<form asp-action="Take" asp-controller="Book" method="post">
+    <input type="hidden" asp-for="BookId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">User email</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Take book
+    </button>
+
+    <a asp-action="Index" asp-controller="Book" class="btn btn-secondary">
+        Back
+    </a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
