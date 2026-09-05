@@ -14,11 +14,48 @@ public class BookController : Controller
         _context = context;
     }
 
-    public IActionResult Index(int  page = 1)
+    public IActionResult Index(string? title, string? author, string? status, string? sortOrder, int  page = 1)
     {
         int pageSize = 2;
         
-        IQueryable<Book> books = _context.Books.OrderByDescending(book => book.CreatedOn);
+        IQueryable<Book> books = _context.Books;
+        
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            string titleSearch = title.Trim().ToLower();
+
+            books = books.Where(book => book.Title.ToLower().Contains(titleSearch));
+        }
+
+        if (!string.IsNullOrWhiteSpace(author))
+        {
+            string authorSearch = author.Trim().ToLower();
+
+            books = books.Where(book => book.Author.ToLower().Contains(authorSearch));
+        }
+        
+        if (status == "available")
+        {
+            books = books.Where(book => !book.IsIssued);
+        }
+        else if (status == "issued")
+        {
+            books = books.Where(book => book.IsIssued);
+        }
+        
+        books = sortOrder switch
+        {
+            "title" => books.OrderBy(book => book.Title),
+            "title_desc" => books.OrderByDescending(book => book.Title),
+
+            "author" => books.OrderBy(book => book.Author),
+            "author_desc" => books.OrderByDescending(book => book.Author),
+
+            "status" => books.OrderBy(book => book.IsIssued),
+            "status_desc" => books.OrderByDescending(book => book.IsIssued),
+
+            _ => books.OrderByDescending(book => book.CreatedOn)
+        };
         
         int count = books.Count();
 
@@ -34,6 +71,11 @@ public class BookController : Controller
         }
         
         List<Book> items = books.Skip((page -1) * pageSize).Take(pageSize).ToList();
+        
+        ViewBag.TitleFilter = title;
+        ViewBag.AuthorFilter = author;
+        ViewBag.StatusFilter = status;
+        ViewBag.SortOrder = sortOrder;
         
         ViewBag.Page = page;
         ViewBag.totalPages = totalPages;

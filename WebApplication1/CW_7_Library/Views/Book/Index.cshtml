@@ -6,6 +6,122 @@
 
 <h1>Library</h1>
 
+<form asp-action="Index" asp-controller="Book" method="get" class="mb-4">
+    <div class="row">
+        <div class="col-md-3 mb-2">
+            <label class="form-label">Title</label>
+            <input type="text"
+                   name="title"
+                   value="@ViewBag.TitleFilter"
+                   class="form-control"
+                   placeholder="Search by title" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <label class="form-label">Author</label>
+            <input type="text"
+                   name="author"
+                   value="@ViewBag.AuthorFilter"
+                   class="form-control"
+                   placeholder="Search by author" />
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+                <option value="">All</option>
+
+                @if (ViewBag.StatusFilter == "available")
+                {
+                    <option value="available" selected>Available</option>
+                }
+                else
+                {
+                    <option value="available">Available</option>
+                }
+
+                @if (ViewBag.StatusFilter == "issued")
+                {
+                    <option value="issued" selected>Issued</option>
+                }
+                else
+                {
+                    <option value="issued">Issued</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <label class="form-label">Sort by</label>
+            <select name="sortOrder" class="form-select">
+                <option value="">Newest first</option>
+
+                @if (ViewBag.SortOrder == "title")
+                {
+                    <option value="title" selected>Title A-Z</option>
+                }
+                else
+                {
+                    <option value="title">Title A-Z</option>
+                }
+
+                @if (ViewBag.SortOrder == "title_desc")
+                {
+                    <option value="title_desc" selected>Title Z-A</option>
+                }
+                else
+                {
+                    <option value="title_desc">Title Z-A</option>
+                }
+
+                @if (ViewBag.SortOrder == "author")
+                {
+                    <option value="author" selected>Author A-Z</option>
+                }
+                else
+                {
+                    <option value="author">Author A-Z</option>
+                }
+
+                @if (ViewBag.SortOrder == "author_desc")
+                {
+                    <option value="author_desc" selected>Author Z-A</option>
+                }
+                else
+                {
+                    <option value="author_desc">Author Z-A</option>
+                }
+
+                @if (ViewBag.SortOrder == "status")
+                {
+                    <option value="status" selected>Status: available first</option>
+                }
+                else
+                {
+                    <option value="status">Status: available first</option>
+                }
+
+                @if (ViewBag.SortOrder == "status_desc")
+                {
+                    <option value="status_desc" selected>Status: issued first</option>
+                }
+                else
+                {
+                    <option value="status_desc">Status: issued first</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Apply
+    </button>
+
+    <a asp-action="Index" asp-controller="Book" class="btn btn-secondary">
+        Clear
+    </a>
+</form>
+
 <a asp-action="Create" asp-controller="Book" class="btn btn-primary mb-3">
     Add new book
 </a>
@@ -86,7 +202,11 @@ else
                     <a class="page-link"
                        asp-action="Index"
                        asp-controller="Book"
-                       asp-route-page="@(ViewBag.Page - 1)">
+                       asp-route-page="@(ViewBag.Page - 1)"
+                       asp-route-title="@ViewBag.TitleFilter"
+                       asp-route-author="@ViewBag.AuthorFilter"
+                       asp-route-status="@ViewBag.StatusFilter"
+                       asp-route-sortOrder="@ViewBag.SortOrder">
                         Previous
                     </a>
                 </li>
@@ -104,7 +224,11 @@ else
                     <a class="page-link"
                        asp-action="Index"
                        asp-controller="Book"
-                       asp-route-page="@(ViewBag.Page + 1)">
+                       asp-route-page="@(ViewBag.Page + 1)"
+                       asp-route-title="@ViewBag.TitleFilter"
+                       asp-route-author="@ViewBag.AuthorFilter"
+                       asp-route-status="@ViewBag.StatusFilter"
+                       asp-route-sortOrder="@ViewBag.SortOrder">
                         Next
                     </a>
                 </li>
