@@ -1,0 +1,65 @@
+@model WebApplication1.Models.LibraryUser
+
+@{
+    ViewData["Title"] = "User details";
+}
+
+<h1>User details</h1>
+
+<div class="card mb-3" style="max-width: 700px;">
+    <div class="card-body">
+        <h4>@Model.FirstName @Model.LastName</h4>
+
+        <p>
+            <strong>Email:</strong> @Model.Email
+        </p>
+
+        <p>
+            <strong>Phone number:</strong> @Model.PhoneNumber
+        </p>
+    </div>
+</div>
+
+<h3>Books currently taken</h3>
+
+@{
+    var activeIssues = Model.BookIssues
+        .Where(issue => issue.ReturnedAt == null)
+        .ToList();
+}
+
+@if (activeIssues.Count == 0)
+{
+    <div class="alert alert-info">
+        This user has no books now.
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var issue in activeIssues)
+        {
+            if (issue.Book != null)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        <img src="@issue.Book.CoverImageUrl"
+                             class="card-img-top"
+                             alt="@issue.Book.Title"
+                             style="height: 250px; object-fit: cover;" />
+
+                        <div class="card-body">
+                            <h5>@issue.Book.Title</h5>
+                            <p><strong>Author:</strong> @issue.Book.Author</p>
+                            <p><strong>Issued at:</strong> @issue.IssuedAt.ToString("dd.MM.yyyy HH:mm")</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+
+<a asp-action="Index" asp-controller="LibraryUser" class="btn btn-secondary">
+    Back
+</a>
